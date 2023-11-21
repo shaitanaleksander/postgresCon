@@ -4,7 +4,8 @@ import org.example.model.Game;
 import org.example.repository.dao.GameRepository;
 
 import java.sql.*;
-import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
 public class GameRepositoryImpl implements GameRepository {
 
@@ -42,8 +43,9 @@ public class GameRepositoryImpl implements GameRepository {
 
         try {
             Statement statement = this.connection.createStatement();
-            ResultSet resultSet = statement.executeQuery("Select * from games where name = " + id);
+            ResultSet resultSet = statement.executeQuery("Select * from games where id = " + id);
             resultSet.next();
+
 
             return Game.builder()
                     .name(resultSet.getString("name"))
@@ -63,15 +65,18 @@ public class GameRepositoryImpl implements GameRepository {
     }
 
     @Override
-    public boolean save(Game game) {
+    public Game save(Game game) {
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement(save);
+            PreparedStatement preparedStatement = connection.prepareStatement(save, PreparedStatement.RETURN_GENERATED_KEYS); // property for preparedStatement to return generated keys
 
             preparedStatement.setString(1, game.getName());
             preparedStatement.setString(2, game.getType());
             preparedStatement.setInt(3, game.getRating());
-            return preparedStatement.execute();
-
+            preparedStatement.executeUpdate();
+            ResultSet generatedKeys = preparedStatement.getGeneratedKeys(); // retrieving generated key
+            generatedKeys.next();
+            game.setId(generatedKeys.getInt(1));
+            return game;
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -106,5 +111,10 @@ public class GameRepositoryImpl implements GameRepository {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public List<Game> findAll() {
+        return new LinkedList<>();
     }
 }

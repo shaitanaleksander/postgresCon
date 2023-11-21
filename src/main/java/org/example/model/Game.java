@@ -10,6 +10,7 @@ public class Game {
     private String name;
     private String type;
     private int rating;
+    private int price;
 
 
 }

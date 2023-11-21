@@ -2,9 +2,11 @@ package org.example.repository.dao;
 
 import org.example.model.Game;
 
+import java.util.List;
+
 public interface GameRepository {
 
-    boolean save(Game game);
+    Game save(Game game);
 
     Game get(int id);
 
@@ -12,4 +14,6 @@ public interface GameRepository {
 
     int update(Game game);
 
+
+    List<Game> findAll();
 }
